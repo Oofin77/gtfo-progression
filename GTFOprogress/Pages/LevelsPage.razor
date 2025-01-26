@@ -1,0 +1,46 @@
+﻿@page "/"
+@using GTFOprogress.Models
+@using GTFOprogress.Common
+@using GTFOprogress.Services
+@using GTFOprogress.Components
+
+@inject IConfiguration _config
+@inject StateHandlerService _stateHandler
+@inject SettingsService _settings
+
+<!--##################################################################-->
+<!--##################################################################-->
+<!--##################################################################-->
+
+<h3 class="text-white text-xs">Version: @_config["version"]</h3>
+<h2 class="text-white text-opacity-50 text-xs">Last Updated: @_config["last-updated"]</h2>
+
+
+<div class="flex justify-center" id="capture">
+    <div class="flex justify-center flex-wrap w-[66rem] gap-8">
+        @if (rundowns != null)
+        {
+            foreach (Rundown rundown in rundowns)
+            {
+                <div class="break-inside-avoid-column w-144 transition-transform duration-100 hover:scale-110">
+                    <RundownComponent rundown="rundown" />
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!--##################################################################-->
+<!--##################################################################-->
+<!--##################################################################-->
+
+@code {
+    List<Rundown>? rundowns;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _stateHandler.InitializeState();
+        await _settings.LoadSettings();
+        rundowns = _stateHandler.GetRundowns();
+    }
+}

@@ -1,0 +1,148 @@
+﻿@using GTFOprogress.Models
+@using GTFOprogress.Common
+@using GTFOprogress.Services
+
+@inject StateHandlerService _stateHandler
+@inject SettingsService _settings
+
+<!--##################################################################-->
+<!--##################################################################-->
+<!--##################################################################-->
+
+<div>
+    @if (level != null)
+    {
+        <div>
+            <div class="text-xs whitespace-nowrap">"@level.Title"</div>
+            <div class="@level.LevelCompletion level-card flex p-0.5 border-solid border-y-2 border-r-2 border-l-8 cursor-default select-none text-base" @onclick='() => updateState("completion")'>
+                <div class="grow flex justify-center">@level.Name</div>
+                <div class="flex flex-col justify-start cursor-default" @onclick:stopPropagation="true">
+                    <div class="@level.SecondaryState task w-[0.3125rem] h-[0.3125rem] p-0 m-[0.0625rem] cursor-default" @onclick='() => updateState("secondary")'></div>
+                    <div class="@level.OverloadState task w-[0.3125rem] h-[0.3125rem] p-0 m-[0.0625rem] cursor-default" @onclick='() => updateState("overload")'></div>
+                    <div class="@level.PrisonerEfficiency task w-[0.3125rem] h-[0.3125rem] p-0 m-[0.0625rem] cursor-default" @onclick='() => updateState("prisoner")'></div>
+                </div>
+            </div>
+        </div>
+    } else
+    {
+        <div></div>
+    }
+</div>
+
+<style>
+    .level-card {
+
+    }
+
+    .title {
+        margin: 0px;
+        display:inline;
+        line-height: 1;  
+    }
+
+    .task-list {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 0px;
+        width: auto;
+        max-width: auto;
+    }
+
+    .task {
+
+    }
+
+    /* For level */
+    .level-card.Empty {
+        color: @_settings.GetSetting("empty-color");
+        border-color: @_settings.GetSetting("empty-color");
+        cursor: not-allowed;
+    }
+
+    .level-card.Incomplete {
+        color: @_settings.GetSetting("secondary-color");
+        border-color: @_settings.GetSetting("secondary-color");
+    }
+
+    .level-card.Complete {
+        color: @_settings.GetSetting("main-color");
+        border-color: @_settings.GetSetting("main-color");
+        box-shadow: 0 0 4px @_settings.GetSetting("main-color");
+    }
+
+    /* For task */
+    .task.Empty {
+        background-color: @_settings.GetSetting("empty-color");
+        border-color: @_settings.GetSetting("secondary-color");
+        border-width: 0.5px;
+        border-style: solid;
+    }
+
+    .task.Incomplete {
+        background-color: @_settings.GetSetting("secondary-color");
+        border-color: @_settings.GetSetting("secondary-color");
+    }
+
+    .task.Complete {
+        background-color: @_settings.GetSetting("main-color");
+        border-color: @_settings.GetSetting("main-color");
+        box-shadow: 0 0 4px @_settings.GetSetting("main-color");
+    }
+</style>
+
+<!--##################################################################-->
+<!--##################################################################-->
+<!--##################################################################-->
+
+@code {
+    [Parameter]
+    public Level? level { get; set; }
+
+    [Parameter]
+    public Action NotifyParent { get; set; }
+
+    public void updateState(string ts)
+    {
+        switch (ts)
+        {
+            case "completion":
+                level.LevelCompletion = ToggleState(level.LevelCompletion);
+                break;
+            case "secondary":
+                level.SecondaryState = ToggleState(level.SecondaryState);
+                break;
+            case "overload":
+                level.OverloadState = ToggleState(level.OverloadState);
+                break;
+            case "prisoner":
+                level.PrisonerEfficiency = ToggleState(level.PrisonerEfficiency);
+                break;
+            default:
+                return;
+
+        }
+        _stateHandler.NotifyStateChanged();
+        NotifyParent?.Invoke();
+        StateHasChanged();
+    }
+
+    public TaskState ToggleState(TaskState ts)
+    {
+        switch (ts)
+        {
+            case TaskState.Empty:
+                return ts;
+                break;
+            case TaskState.Incomplete:
+                return TaskState.Complete;
+                break;
+            case TaskState.Complete:
+                return TaskState.Incomplete;
+                break;
+            default:
+                return ts;
+                break;
+        }
+    }
+}

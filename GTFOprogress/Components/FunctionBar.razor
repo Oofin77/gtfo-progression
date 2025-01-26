@@ -1,0 +1,34 @@
+﻿@using GTFOprogress.Services
+@inject IJSRuntime JSRuntime
+@inject StateHandlerService _stateHandler
+
+<div>
+    <div class="import"> import:// </div>
+    <div class="export"> export:// </div>
+    <div class="screenshot" @onclick="Screenshot">Screenshot</div>
+    <div class="reset" @onclick="ResetData">RESET</div>
+</div>
+
+@code {
+
+    public void import()
+    {
+        //implement
+    }
+
+    public void export()
+    {
+        //implement
+    }
+
+    private async Task Screenshot()
+    {
+        await JSRuntime.InvokeVoidAsync("renderToClipboard");
+    }
+
+    private void ResetData()
+    {
+        _stateHandler.ResetStateToDefault();
+    }
+
+}
