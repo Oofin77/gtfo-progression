@@ -5,12 +5,10 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  pages: write  
-
 jobs:
   deploy:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
