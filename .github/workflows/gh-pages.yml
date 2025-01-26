@@ -3,12 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
